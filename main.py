@@ -13,14 +13,21 @@ For solving this problem by MCMC method,
 we need to find the optimum likelihood function
 '''
 
+# all distances are in kilometers
+radius_earth = 6378.1
+karman_line = 100
+geostationary_altitude = 35786
+a_min = radius_earth + karman_line
+a_geo = radius_earth + geostationary_altitude
+
 def random_a():
-    return 4e3 + 6e3 *abs(np.random.rand())
+    return a_min + a_geo *abs(np.random.rand())
 
 def random_ecc():
     return np.random.rand()*0.01
 
 def random_inc():
-    return np.random.rand()*270
+    return abs(np.random.rand()*180)
 
 def random_raan():
     return np.random.rand()*360
@@ -29,7 +36,7 @@ def random_argp():
     return np.random.rand()*360
 
 def random_nu():
-    return np.random.rand()*180
+    return abs(np.random.rand()*360)
 
 nwalkers = 50
 ndim = 6
@@ -56,13 +63,13 @@ def lnprob( param, cov ):
     a, inc, raan, ecc, argp, nu = param
     ### Limit the parameter space ###
     
-    if a < 4e3:
+    if a < a_min:
         return -np.inf
     
     if (ecc < -1) or (ecc > 1) :
         return -np.inf
     
-    if (inc < 20) or (inc > 270):
+    if (inc < 0) or (inc > 180):
         return -np.inf
 
     if abs(raan) > 360:
@@ -71,7 +78,7 @@ def lnprob( param, cov ):
     if abs(argp) > 360:
         return -np.inf
     
-    if abs(nu) > 180:
+    if nu < 0 or nu > 360:
         return -np.inf
 
     propagator = SGP4()
@@ -85,7 +92,7 @@ def lnprob( param, cov ):
         # time = epochs[1]
         gap = time - epochs[0]
         propagated = propagator.propagate(0, gap)[-1]
-        error += state_vectors[1] - propagated
+        error += state_vectors[index] - propagated
     
     error /= len(epochs)
     return -0.5 * np.dot(error, np.linalg.solve(cov, error))
@@ -120,6 +127,6 @@ axs[1, 1].set_title('Eccentricity')
 axs[2, 0].plot(xpts, samples[:, 4])
 axs[2, 0].set_title('Argument of Periapsis')
 axs[2, 1].plot(xpts, samples[:, 5])
-axs[2, 1].set_title('True Anomaly')
+axs[2, 1].set_title('Mean Anomaly')
 
 plt.show()

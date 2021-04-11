@@ -6,7 +6,7 @@ import time
 
 directory = './data/'
 ts = load.timescale()
-timesteps = 100
+timesteps = 10
 
 file = open('labels.json', 'r')
 data = json.load(file)
