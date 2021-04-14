@@ -3,6 +3,8 @@ import emcee
 import csv
 import corner
 
+from sklearn.preprocessing import MinMaxScaler
+
 from sgp4propagator import SGP4
 
 '''
@@ -73,6 +75,12 @@ with open('./STARLINK-1401.csv', 'r') as f:
         state_vectors.append([ float(i) for i in row[1:] ])
         epochs.append( int(row[0]) )
 
+ndim_state_vectors = len(state_vectors[0])
+ndata = len(state_vectors)
+
+scaler = MinMaxScaler()
+scaler.fit(np.array(state_vectors))
+
 def lnprob( param, covariance ):
     """
     param = [a, inc, raan, ecc, argp, nu]
@@ -83,7 +91,7 @@ def lnprob( param, covariance ):
     if a < a_min or a > a_max:
         return -np.inf
     
-    if ecc < -1 or ecc > 1 :
+    if ecc < 0 or ecc > 1 :
         return -np.inf
     
     if inc < 0 or inc > 180:
@@ -118,14 +126,15 @@ def lnprob( param, covariance ):
         if index == 0:
             continue
         gap = time - epochs[0]
-        propagated = propagator.propagate(0, gap)[-1]
+        propagated = np.array(propagator.propagate(0, gap)[-1]).reshape(1, ndim_state_vectors)
         '''
         Since value of semi-major axis is much larger than the other values,
         it might have a strong influence on the error. yet to research more on this.
         '''
-        error += state_vectors[index] - propagated
+        error += scaler.transform(np.array(state_vectors[index]).reshape(1, ndim_state_vectors)) - scaler.transform(propagated)
     
-    error /= len(epochs)
+    error /= len(epochs) - 1
+    error = error.reshape((ndim_state_vectors, ))
     return -0.5 * np.dot(error, np.linalg.solve(covariance, error))
 
 '''
