@@ -4,7 +4,6 @@ import csv
 import corner
 
 from sklearn.preprocessing import MinMaxScaler
-
 from sgp4propagator import SGP4
 
 '''
