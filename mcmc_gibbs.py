@@ -4,6 +4,7 @@ import csv
 import corner
 
 from gibbs import Gibbs
+from covariance import covariance_matrix
 
 '''
 The structure of this script is from this Jupyter notebook:
@@ -114,12 +115,14 @@ Started off by picking samples from n-dimensional Gaussian
 Fortunately, there was a snippet in emcee docs as well :
 https://emcee.readthedocs.io/en/stable/tutorials/quickstart/
 '''
-np.random.seed(1401)
-means = np.random.rand(ndim)
-covariance = 0.5 - np.random.rand(ndim ** 2).reshape((ndim, ndim))
-covariance = np.triu(covariance)
-covariance += covariance.T - np.diag(covariance.diagonal())
-covariance = np.dot(covariance, covariance)
+# np.random.seed(1401)
+# means = np.random.rand(ndim)
+# covariance = 0.5 - np.random.rand(ndim ** 2).reshape((ndim, ndim))
+# covariance = np.triu(covariance)
+# covariance += covariance.T - np.diag(covariance.diagonal())
+# covariance = np.dot(covariance, covariance)
+
+covariance = covariance_matrix()
 
 print(" MCMC running with {} walkers, {} Steps".format(nwalkers, MCMC_steps))
 sampler = emcee.EnsembleSampler(nwalkers, ndim, lnprob, args=[covariance], threads=8)
