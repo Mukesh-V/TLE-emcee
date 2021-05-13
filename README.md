@@ -11,12 +11,11 @@ In case, you are interested in using this repo locally, making a venv is your ch
     python3 -m pip install -r requirements.txt
 ```
 
-I propose an emcee-based model which samples from a n-dimensional Gaussian ( this selection of distribution is initial : requires further research )
+I propose an emcee-based model which samples from a 6 dimensional space with likelihood calculated by MSE of 
+positional state vectors
 ``` py
     # Difference based on state vectors propagated by sgp4
     python3 mcmc_sgp4.py
-    # Difference based on kepler elements found by Gibbs method
-    python3 mcmc_gibbs.py
 ```
 
 The datasets were generated from TLEs publicly available at [Celestrak](https://www.celestrak.com/NORAD/elements/) by a Python astronomy library [Skyfield](https://rhodesmill.org/skyfield/). Some of the TLEs are duplicated between categories; Skyfield couldn't generate data for few others. So, I had to remove few of them manually. The final list of TLEs are in the *celestrak* folder : there are totally, 1616 unique satellites!

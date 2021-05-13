@@ -19,8 +19,8 @@ except:
 
 satellites = []
 for i in data:
-    satellites.append( EarthSatellite(i['line1'],i['line2'], name=i['name']) )
-by_name = {sat.name:sat for sat in satellites}
+    satellites.append( EarthSatellite( i['line1'],i['line2'], name=i['name'] ) )
+by_name = { sat.name:sat for sat in satellites }
 print(len(satellites), 'satellites loaded!')
 
 for i in range(timesteps):
@@ -40,9 +40,8 @@ for i in range(timesteps):
             t = ts.now()
             writer = csv.writer(f)
             pos = sat.at(t).position.km
-            vel = sat.at(t).velocity.km_per_s
             timestamp = int( ts.now().utc_datetime().timestamp() )
-            writer.writerow([timestamp, pos[0], pos[1], pos[2], vel[0], vel[1], vel[2]])
+            writer.writerow([ timestamp, pos[0], pos[1], pos[2] ])
             
     time.sleep(10)    
     print('Timestep :', i)
