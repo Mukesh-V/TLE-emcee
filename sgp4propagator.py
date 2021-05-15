@@ -142,7 +142,7 @@ class SGP4(object):
             # ele = gibbs.orbital_elements(pos, vel)
             # print(str(tsince) + " - " + str(ele))
             # print(str(tsince) + " - " + str(pos) + " " + str(vel))
-            final[i,:] = data
+            final[i-t1,:] = data
             i = i + 1
 
         # del(gibbs)
